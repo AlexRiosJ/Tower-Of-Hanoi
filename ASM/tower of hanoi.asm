@@ -10,11 +10,11 @@
 	
 .text
 	main:
-		la $s0, towerA
-		la $s1, towerB
-		la $s2, towerC
-		lw $a0, 0($s0)
-		add $a1, $s0, $zero
+		la $s0, towerA # Direccion de memoria de TowerA
+		la $s1, towerB # Direccion de memoria de TowerB
+		la $s2, towerC # Direccion de memoria de TowerC
+		lw $a0, 0($s0) # Valor del primer elemento de TowerA (Disco más grande)
+		add $a1, $s0, $zero 
 		add $a2, $s2, $zero
 		add $a3, $s1, $zero
 		jal move_tower
@@ -25,7 +25,7 @@
 		sw $ra, 16($sp)
 		sw $a0, 12($sp)
 		sw $a1, 8($sp)
-		sw $a2, 4($sp)		
+		sw $a2, 4($sp)	
 		sw $a3, 0($sp)
 		beq $a0, 1, equal_one # if (disk == 1)
 		

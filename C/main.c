@@ -71,15 +71,13 @@ int pop(int arr[]) {
 }
 
 void push(int arr[], int value) {
-	int i = NUMBER_OF_DISKS - 1;
-	while(i >= 0) {
-		if(i > 0 && arr[i - 1] != 0) {
+	int i = 0;
+	while(i < NUMBER_OF_DISKS) {
+		if(arr[i] == 0) {
 			arr[i] = value;
 			break;
-		} else if(i == 0) {
-			arr[i] = value;
 		}
-		i = i - 1;
+		i = i + 1;
 	}
 }
 
