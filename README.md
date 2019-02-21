@@ -1,2 +1,2 @@
 # Tower-Of-Hanoi
-Tower Of Hanoi solved with recursion with MIPS.
+Tower Of Hanoi solved with recursion in MIPS.
