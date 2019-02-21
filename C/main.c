@@ -13,7 +13,7 @@
 void moveTower(int disk, int source[], int dest[], int spare[]);
 int pop(int arr[]);
 void push(int arr[], int value);
-void printArr(int arr[], char tower);
+void printTower(int arr[], char tower);
 
 unsigned int moves = 0;
 int towerA[NUMBER_OF_DISKS];
@@ -27,16 +27,16 @@ int main() {
 		towerC[i] = 0;
 	}
 
-	printArr(towerA, 'A');
-	printArr(towerB, 'B');
-	printArr(towerC, 'C');
+	printTower(towerA, 'A');
+	printTower(towerB, 'B');
+	printTower(towerC, 'C');
 	printf("\n");
 
 	moveTower(towerA[0], towerA, towerC, towerB);
 
-	printArr(towerA, 'A');
-	printArr(towerB, 'B');
-	printArr(towerC, 'C');
+	printTower(towerA, 'A');
+	printTower(towerB, 'B');
+	printTower(towerC, 'C');
 	printf("\nMoves: %d", moves);
 
 	return 0;
@@ -83,7 +83,7 @@ void push(int arr[], int value) {
 	}
 }
 
-void printArr(int arr[], char tower) {
+void printTower(int arr[], char tower) {
 	printf("%c -- ", tower);
 	for(int i = 0; i < NUMBER_OF_DISKS; i ++) {
 		if(arr[i] != 0) printf("%d ", arr[i]);

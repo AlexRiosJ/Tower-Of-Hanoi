@@ -1,7 +1,7 @@
 # Author: Alejandro Rios
 # Exp: is708932
-# Date: Feb 17, 2019
-# Torres de Hanoi
+# Date: Feb 21, 2019
+# Tower Of Hanoi
 
 .data 
 	towerA: .word 4 3 2 1
