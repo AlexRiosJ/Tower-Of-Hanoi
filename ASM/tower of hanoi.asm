@@ -2,11 +2,11 @@
 # Exp: is708932
 # Date: Feb 21, 2019
 # Tower Of Hanoi
-
+ 
 .data 
-	towerA: .word 4 3 2 1
-	towerB: .word 0 0 0 0
-	towerC: .word 0 0 0 0
+	towerA: .word 8 7 6 5 4 3 2 1
+	towerB: .word 0 0 0 0 0 0 0 0
+	towerC: .word 0 0 0 0 0 0 0 0
 	
 .text
 	main:
@@ -35,15 +35,16 @@
 		add $a2, $a3, $zero # dest = spare
 		add $a3, $t1, $zero # spare = temp
 		jal move_tower
-		lw $ra, 0($sp)
-		lw $a0, 4($sp) # disk
-		lw $a1, 8($sp) # source
-		lw $a2, 12($sp) # dest
-		lw $a3, 16($sp) # spare
-		addi $sp, $sp, 20
+		lw $a0, 4($sp)
+		lw $a1, 8($sp)
+		lw $a2, 12($sp)
 		add $t8, $a1, $zero
 		add $t9, $a2, $zero
 		jal move_disk
+		lw $a0, 4($sp)
+		lw $a1, 8($sp)
+		lw $a2, 12($sp)
+		lw $a3, 16($sp)
 		addi $a0, $a0, -1
 		add $t1, $a1, $zero # temp = source
 		add $a1, $a3, $zero # source = spare
@@ -79,7 +80,7 @@
 		
 	pop:
 		add $t0, $zero, $zero # temp = 0
-		addi $t8, $t8, 12
+		addi $t8, $t8, 28
 		while_pop: # while
 		lw $t2, ($t8)
 		beq $t2, -1, end_while_pop
@@ -99,7 +100,7 @@
 		add $t9, $t9, $t3
 		add $t3, $zero, $zero
 		lw $t2, ($t9) # temp = dest[i]
-		beq $t3, 16, end_while_push
+		beq $t3, 32, end_while_push
 		bne $t2, $zero, end_if_push
 		sw $v0, ($t9)
 		j end_while_push
