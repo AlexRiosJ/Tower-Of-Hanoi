@@ -1,114 +1,110 @@
 # Author: Alejandro Rios
 # Exp: is708932
-# Date: Feb 21, 2019
+# Date: Feb 22, 2019
 # Tower Of Hanoi
  
 .data 
-	towerA: .word 8 7 6 5 4 3 2 1
-	towerB: .word 0 0 0 0 0 0 0 0
-	towerC: .word 0 0 0 0 0 0 0 0
+	towerA: .word 8 7 6 5 4 3 2 1 # 8 Disks
+	towerB: .word 0 0 0 0 0 0 0 0 # 0 means no disk
+	towerC: .word 0 0 0 0 0 0 0 0 # 0 means no disk
 	
 .text
 	main:
-		la $s0, towerA # Direccion de memoria de TowerA
-		la $s1, towerB # Direccion de memoria de TowerB
-		la $s2, towerC # Direccion de memoria de TowerC
-		lw $a0, 0($s0) # Valor del primer elemento de TowerA (Disco más grande)
-		add $a1, $s0, $zero # Source 
-		add $a2, $s2, $zero # Destiny
+		la $s0, towerA # Tower A memory address
+		la $s1, towerB # Tower B memory address
+		la $s2, towerC # Tower C memory address
+		lw $a0, 0($s0) # Biggest disk
+		add $a1, $s0, $zero # Source
+		add $a2, $s2, $zero # Destination
 		add $a3, $s1, $zero # Spare
-		jal move_tower
-		j exit
+		jal move_tower # First call (disk, source, dest, spare)
+		j exit # Exit jump
 	
 	move_tower:
-		addi $sp, $sp, -20
-		sw $ra, 0($sp)
-		sw $a0, 4($sp) # disk
-		sw $a1, 8($sp) # source
-		sw $a2, 12($sp) # dest
-		sw $a3, 16($sp) # spare
-		
+		addi $sp, $sp, -20 # Save space in stack
+		sw $ra, 0($sp) # Save return address
+		sw $a0, 4($sp) # Save disk
+		sw $a1, 8($sp) # Save source
+		sw $a2, 12($sp) # Save destination
+		sw $a3, 16($sp) # Save spare
 		beq $a0, 1, equal_one # if (disk == 1)
-		addi $a0, $a0, -1
+		# Else
+		addi $a0, $a0, -1 # Look for the smaller disks (first)
 		add $a1, $a1, $zero # source = source
 		add $t1, $a2, $zero # temp = dest
 		add $a2, $a3, $zero # dest = spare
 		add $a3, $t1, $zero # spare = temp
-		jal move_tower
-		lw $a0, 4($sp)
-		lw $a1, 8($sp)
-		lw $a2, 12($sp)
-		add $t8, $a1, $zero
+		jal move_tower # First recursive call
+		lw $a0, 4($sp) # Get the disk for the general call
+		lw $a1, 8($sp) # Get the source for the general call
+		lw $a2, 12($sp) # Get the destination for the general call
+		add $t8, $a1, $zero # Move to temp as arguments
 		add $t9, $a2, $zero
-		jal move_disk
-		lw $a0, 4($sp)
-		lw $a1, 8($sp)
-		lw $a2, 12($sp)
-		lw $a3, 16($sp)
-		addi $a0, $a0, -1
+		jal move_disk # Move disk from source to dest
+		lw $a0, 4($sp) # Get the disk for the general call
+		lw $a1, 8($sp) # Get the source for the general call
+		lw $a2, 12($sp) # Get the destination for the general call
+		lw $a3, 16($sp) # Get the spare for the general call
+		addi $a0, $a0, -1 # Look for the smaller disks (second)
 		add $t1, $a1, $zero # temp = source
 		add $a1, $a3, $zero # source = spare
 		add $a2, $a2, $zero # dest = dest
 		add $a3, $t1, $zero # spare = temp
-		jal move_tower
-		j end_if
+		jal move_tower # Second recursive call
+		j end_if # End of if statement
 		 
 	
-	equal_one:
-		add $t8, $a1, $zero
+	equal_one: # if (disk == 1)
+		add $t8, $a1, $zero # Move to temp as arguments
 		add $t9, $a2, $zero
-		jal move_disk
+		jal move_disk # Move disk from source to dest (base case)
 		
 		
-	end_if:
-		lw $ra, 0($sp)
-		lw $a0, 4($sp) # disk
-		lw $a1, 8($sp) # source
-		lw $a2, 12($sp) # dest
-		lw $a3, 16($sp) # spare
-		addi $sp, $sp, 20
-		jr $ra
+	end_if: # Save stack values
+		lw $ra, 0($sp) # Return address
+		lw $a0, 4($sp) # Disk
+		lw $a1, 8($sp) # Source
+		lw $a2, 12($sp) # Destination
+		lw $a3, 16($sp) # Spare
+		addi $sp, $sp, 20 # Bring back address in stack pointer
+		jr $ra # Return to recursive general
 		
 	move_disk:
-		addi $sp, $sp, -4
-		sw $ra, 0($sp)
-		jal pop
-		jal push
-		lw $ra, 0($sp)
-		addi $sp, $sp, 4
-		jr $ra
+		addi $sp, $sp, -4 # Save space in stack
+		sw $ra, 0($sp) # Save return address
+		jal pop # Call pop from source
+		jal push # Call push to destination
+		lw $ra, 0($sp) # Return address
+		addi $sp, $sp, 4 # Bring back address in stack pointer
+		jr $ra # Return from move_disk
 		
 	pop:
-		add $t0, $zero, $zero # temp = 0
-		addi $t8, $t8, 28
+		addi $t8, $t8, 28 # (NUMBER_OF_DISKS * 4) - 1
 		while_pop: # while
-		lw $t2, ($t8)
-		beq $t2, -1, end_while_pop
-		beq $t2, $zero, end_if_pop
+		lw $t2, ($t8) # Get value of element at the top
+		beq $t2, -1, end_while_pop # if (element >= 0) break
+		beq $t2, $zero, end_if_pop # if (element == 0) continue
 		add $v0, $t2, $zero # temp = source[i]
 		sw $zero, ($t8)   # source[i] = 0
 		j end_while_pop # break
 		end_if_pop:
-		addi $t8, $t8, -4
+		addi $t8, $t8, -4 # i = i - 1
 		j while_pop
 		end_while_pop:
-		jr $ra
+		jr $ra # Return to push
 		
 	push:
-		addi $t3, $zero, 0
 		while_push:
-		add $t9, $t9, $t3
-		add $t3, $zero, $zero
-		lw $t2, ($t9) # temp = dest[i]
-		beq $t3, 32, end_while_push
-		bne $t2, $zero, end_if_push
-		sw $v0, ($t9)
-		j end_while_push
+		lw $t2, ($t9) # element = dest[i] 
+		beq $t3, 32, end_while_push # if (i == NUMBER_OF_DISKS * 4) break
+		bne $t2, $zero, end_if_push # if (element != 0) continue
+		sw $v0, ($t9) # else dest[i] = pop value
+		j end_while_push # Break while
 		end_if_push:
-		addi $t3, $t3, 4
+		addi $t9, $t9, 4 # dest[i ++]
 		j while_push
 		end_while_push:
-		jr $ra
+		jr $ra # Return to recursive general
 		
 				
-	exit: # Fin
+	exit: # End
