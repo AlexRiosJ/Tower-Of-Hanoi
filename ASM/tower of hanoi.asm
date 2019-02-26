@@ -1,56 +1,76 @@
-# Author: Alejandro Rios
-# Exp: is708932
-# Date: Feb 21, 2019
+# Authors: Alejandro Rios, Javier Ochoa
+# Exp: is708932, 
+# Date: Feb 25, 2019
 # Tower Of Hanoi
 
-.data 
-	towerA: .word 4 3 2 1
-	towerB: .word 0 0 0 0
-	towerC: .word 0 0 0 0
-	
 .text
+	addi $s0, $zero, 8 # Number of disks
+	addi $s1, $s1, 0x1001
+	sll $s1, $s1, 16 # Save address of tower A
+	addi $s2, $s1, 0x20 # Save address of tower B
+	addi $s3, $s2, 0x20 # Save address of tower C
+	add $t0, $s0, $zero
+	
+	for: # Fill tower A with all the disks
+		beq $t0, $zero, end_for
+		sw $t0, 0($s1)
+		addi $s1, $s1, 4
+		addi $t0, $t0, -1
+		j for
+		end_for:
+	
 	main:
-		la $s0, towerA # Direccion de memoria de TowerA
-		la $s1, towerB # Direccion de memoria de TowerB
-		la $s2, towerC # Direccion de memoria de TowerC
-		lw $a0, 0($s0) # Valor del primer elemento de TowerA (Disco más grande)
-		add $a1, $s0, $zero 
-		add $a2, $s2, $zero
-		add $a3, $s1, $zero
-		jal move_tower
-		j exit
+		add $a0, $s0, $zero # Biggest disk
+		add $a1, $s1, $zero # Source
+		add $a2, $s3, $zero # Destination
+		add $a3, $s2, $zero # Spare
+		jal move_tower # First call (disk, source, dest, spare)
+		j exit # Exit jump
 	
 	move_tower:
-		addi $sp, $sp, -20
-		sw $ra, 16($sp)
-		sw $a0, 12($sp)
-		sw $a1, 8($sp)
-		sw $a2, 4($sp)	
-		sw $a3, 0($sp)
-		beq $a0, 1, equal_one # if (disk == 1)
-		
-		addi $a0, $a0, -1
-		add $a1, $a1, $zero
-		add $t1, $a2, $zero
-		add $a2, $a3, $zero
-		add $a3, $t1, $zero
-		jal move_tower
+		addi $sp, $sp, -8 # Save space in stack
+		sw $ra, 0($sp) # Save return address
+		sw $a0, 4($sp) # Save disk
+		# If (disk == 1)
+		beq $a0, 1, equal_one 
+		# Else
+		addi $a0, $a0, -1 # Look for a smaller disk (first)
+		add $t0, $a2, $zero # temp = dest
+		add $a2, $a3, $zero # dest = spare
+		add $a3, $t0, $zero # spare = temp
+		jal move_tower # First recursive call
+		add $t0, $a2, $zero # temp = dest
+		add $a2, $a3, $zero # dest = spare
+		add $a3, $t0, $zero # spare = temp
+		jal move_disk # Move disk from source to dest
+		lw $a0, 4($sp) # Get the disk for the general call
+		addi $a0, $a0, -1 # Look for a smaller disk (second)
+		add $t0, $a1, $zero # temp = source
+		add $a1, $a3, $zero # source = spare
+		add $a3, $t0, $zero # spare = temp
+		jal move_tower # Second recursive call
+		add $t0, $a1, $zero # temp = source
+		add $a1, $a3, $zero # source = spare
+		add $a3, $t0, $zero # spare = temp
+		j end_if # End of if statement
 		 
-	
 	equal_one:
-		jal move_disk
-	
-	end_if:
+		jal move_disk # Move disk from source to dest (base case)
+		
+	end_if: # Save stack values
+		lw $ra, ($sp) # Return address
+		addi $sp, $sp, 8 # Bring back address in stack pointer
+		jr $ra # Return to recursive general
 		
 	move_disk:
-		addi $sp, $sp, -12
-		sw $ra, 8($sp)
-		sw $a1, 4($sp)
-		sw $a2, 0($sp)
+	# pop - push in line *********************************************
+		# pop
+		addi $a1, $a1, -4
+		lw $t0, ($a1) # Get value of element at the top
+		sw $zero, ($a1) # Write 0 in white space
+		# push
+		sw $t0, ($a2) # Push at the top of the tower
+		addi $a2, $a2, 4 # Update top pointer
+		jr $ra # Return from move_disk
 		
-		
-		
-		
-		
-				
-	exit: # Fin
+	exit: # End
