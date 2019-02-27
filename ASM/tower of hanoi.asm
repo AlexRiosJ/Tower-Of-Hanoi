@@ -1,6 +1,6 @@
 # Authors: Alejandro Rios, Javier Ochoa
 # Exp: is708932, is702811
-# Date: Feb 25, 2019
+# Date: Feb 26, 2019
 # Tower Of Hanoi
 
 .text
@@ -42,7 +42,16 @@
 		add $t0, $a2, $zero # temp = dest
 		add $a2, $a3, $zero # dest = spare
 		add $a3, $t0, $zero # spare = temp
-		jal move_disk # Move disk from source to dest
+		
+		# This move_disk code does not need to be called so is writen here
+		# pop
+		addi $a1, $a1, -4
+		lw $t0, ($a1) # Get value of element at the top
+		sw $zero, ($a1) # Write 0 in white space
+		# push
+		sw $t0, ($a2) # Push at the top of the tower
+		addi $a2, $a2, 4 # Update top pointer
+		
 		lw $a0, 4($sp) # Get the disk for the general call
 		addi $a0, $a0, -1 # Look for a smaller disk (second)
 		add $t0, $a1, $zero # temp = source
@@ -63,7 +72,7 @@
 		jr $ra # Return to recursive general
 		
 	move_disk:
-	# pop - push in line *********************************************
+	# pop - push in line
 		# pop
 		addi $a1, $a1, -4
 		lw $t0, ($a1) # Get value of element at the top
