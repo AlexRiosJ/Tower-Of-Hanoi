@@ -64,15 +64,7 @@
 		j end_if # End of if statement
 		 
 	equal_one:
-		jal move_disk # Move disk from source to dest (base case)
-		
-	end_if: # Save stack values
-		lw $ra, ($sp) # Return address
-		addi $sp, $sp, 8 # Bring back address in stack pointer
-		jr $ra # Return to recursive general
-		
-	move_disk:
-	# pop - push in line
+		# This move_disk code does not need to be called so is writen here
 		# pop
 		addi $a1, $a1, -4
 		lw $t0, ($a1) # Get value of element at the top
@@ -80,6 +72,10 @@
 		# push
 		sw $t0, ($a2) # Push at the top of the tower
 		addi $a2, $a2, 4 # Update top pointer
-		jr $ra # Return from move_disk
+		
+	end_if: # Save stack values
+		lw $ra, ($sp) # Return address
+		addi $sp, $sp, 8 # Bring back address in stack pointer
+		jr $ra # Return to recursive general
 		
 	exit: # End
