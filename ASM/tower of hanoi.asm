@@ -13,7 +13,7 @@
 	
 	for: # Fill tower A with all the disks
 		beq $t0, $zero, end_for
-		sw $t0, 0($s1)
+		sw $t0, ($s1)
 		addi $s1, $s1, 4
 		addi $t0, $t0, -1
 		j for
@@ -28,9 +28,8 @@
 		j exit # Exit jump
 	
 	move_tower:
-		addi $sp, $sp, -8 # Save space in stack
-		sw $ra, 0($sp) # Save return address
-		sw $a0, 4($sp) # Save disk
+		addi $sp, $sp, -4 # Save space in stack
+		sw $ra, ($sp) # Save return address
 		# If (disk == 1)
 		beq $a0, 1, equal_one 
 		# Else
@@ -52,7 +51,6 @@
 		sw $t0, ($a2) # Push at the top of the tower
 		addi $a2, $a2, 4 # Update top pointer
 		
-		lw $a0, 4($sp) # Get the disk for the general call
 		addi $a0, $a0, -1 # Look for a smaller disk (second)
 		add $t0, $a1, $zero # temp = source
 		add $a1, $a3, $zero # source = spare
@@ -74,8 +72,9 @@
 		addi $a2, $a2, 4 # Update top pointer
 		
 	end_if: # Save stack values
+		addi $a0, $a0, 1 # Get the disk for the general call
 		lw $ra, ($sp) # Return address
-		addi $sp, $sp, 8 # Bring back address in stack pointer
+		addi $sp, $sp, 4 # Bring back address in stack pointer
 		jr $ra # Return to recursive general
 		
 	exit: # End
